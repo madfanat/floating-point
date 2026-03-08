@@ -204,9 +204,11 @@ class FloatingPoint {
   }
 
  private:
-  Type mantissa_ : kMantissaBits;
-  Type exponent_ : kExponentBits;
-  Type sign_ : 1;
+  struct Unpacked {
+    uint64_t mantissa;
+    int32_t exponent;
+    uint32_t sign;
+  };
 
   static constexpr uint32_t kSignificandBits = kMantissaBits + 1;
   static constexpr uint32_t kMantissaMask = (1 << kMantissaBits) - 1;
@@ -223,14 +225,6 @@ class FloatingPoint {
       (kMantissaBits + kExponentBits + 1 + 3) / 4;
   static constexpr uint32_t kMantissaShiftHex =
       kMantissaHex * 4 - kMantissaBits;
-
-  inline static Rounding rounding_ = Rounding::kTowardZero;
-
-  struct Unpacked {
-    uint64_t mantissa;
-    int32_t exponent;
-    uint32_t sign;
-  };
 
   Unpacked Unpack() const {
     if (exponent_ == 0) {
@@ -455,4 +449,10 @@ class FloatingPoint {
         static_cast<uint32_t>(mantissa >> remainder_bits) & kMantissaMask,
         remainder, divisor, exponent, sign);
   }
+
+  Type mantissa_ : kMantissaBits;
+  Type exponent_ : kExponentBits;
+  Type sign_ : 1;
+
+  inline static Rounding rounding_ = Rounding::kTowardZero;
 };
